@@ -1,23 +1,28 @@
-import { StatusCodes, getReasonPhrase } from "http-status-codes";
+import { StatusCodes, getReasonPhrase } from 'http-status-codes';
+
+import { ResponseStatus } from '@/types/enums';
 interface ApiErrorOptions {
-  statusCode: number;
-  messages: string[];
-  metadata?: Object;
+  statusCode: StatusCodes;
+  messages: { message: string; type?: string }[];
+  metadata?: any;
+  status: ResponseStatus;
 }
 
 export class ApiError extends Error {
-  public statusCode: StatusCodes;
-  public messages: string[];
-  metadata?: Object;
-  constructor({ statusCode, messages, metadata }: ApiErrorOptions) {
+  public statusCode;
+  status;
+  messages;
+  metadata;
+  constructor({ statusCode, messages, metadata, status }: ApiErrorOptions) {
     super();
+    this.name = getReasonPhrase(statusCode);
     this.statusCode = statusCode;
+    this.status = status;
     this.messages = messages;
     this.metadata = metadata;
-    this.name = getReasonPhrase(statusCode);
     this.stack =
-      process.env.NODE_ENV === "production"
-        ? "You are in production"
+      process.env.NODE_ENV === 'production'
+        ? 'You are in production'
         : this.stack;
   }
 }

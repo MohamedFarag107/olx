@@ -8,16 +8,17 @@ datasource db {
 }
 
 model User {
-  id        String    @id @default(auto()) @map("_id") @db.ObjectId
-  email     String    @unique
-  password  String
-  name      String?
-  profile   File?     @relation(fields: [prfileId], references: [id])
-  prfileId  String?   @map("profileId") @db.ObjectId
-  role      Role      @default(USER)
-  address   Address[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id               String    @id @default(auto()) @map("_id") @db.ObjectId
+  email            String    @unique
+  password         String
+  name             String?
+  profile          File?     @relation(fields: [prfileId], references: [id])
+  prfileId         String?   @map("profileId") @db.ObjectId
+  role             Role      @default(USER)
+  address          Address[]
+  passwordChangeAt DateTime  @default(now())
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
 }
 
 enum Role {
