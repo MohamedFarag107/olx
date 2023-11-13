@@ -1,17 +1,24 @@
 import expressAsyncHandler from 'express-async-handler';
-import { validationResult } from 'express-validator';
+import { matchedData, validationResult } from 'express-validator';
 import { NextFunction, Request, Response } from 'express';
 import { ApiError, ApiValidationError } from '@/error';
 
 export const validationMiddleware = expressAsyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const result = validationResult(req);
+
     if (!result.isEmpty()) {
       const messages: ApiError['messages'] = result
-        .array()
+        .array({ onlyFirstError: true })
         .map((error) => ({ message: error.msg, type: error.type }));
       throw new ApiValidationError(messages, result.array());
     }
+
+    const matchedBody = matchedData(req, { locations: ['body'] });
+    const matchedParams = matchedData(req, { locations: ['params'] });
+
+    req.body = matchedBody;
+    req.params = matchedParams;
 
     next();
   },

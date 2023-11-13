@@ -1,5 +1,13 @@
 import { BadRequestError } from '@/error';
-import { ApiResponse, Password, generateToken, prisma } from '@/utils';
+import {
+  ApiResponse,
+  Password,
+  cryptoHash,
+  exclude,
+  generateToken,
+  prisma,
+  sendForgetPasswordEmail,
+} from '@/utils';
 import expressAsyncHandler from 'express-async-handler';
 import { StatusCodes } from 'http-status-codes';
 
@@ -22,6 +30,8 @@ export const signup = expressAsyncHandler(async (req, res, next) => {
   }
 
   const hashedPassword = Password.hash(password);
+
+  // TODO: Update user if token exists in the sessions
 
   const user = await prisma.user.create({
     data: {
@@ -112,28 +122,99 @@ export const signout = expressAsyncHandler(async (req, res, next) => {
 });
 
 /**
- * @desc    Get user details
- * @route   GET /api/v1/auth/me
- * @access  Private
+ * @desc    Forget password
+ * @route   POST /api/v1/auth/forget-password
+ * @access  Public
  */
-export const getMe = expressAsyncHandler(async (req, res, next) => {
-  const user = await prisma.user.findUnique({
-    where: {
-      id: req.user!.id,
-    },
-    select: {
-      password: false,
-    },
-  });
+
+interface ForgetPasswordBody {
+  email: string;
+}
+export const forgetPassword = expressAsyncHandler(async (req, res, next) => {
+  const { email } = <ForgetPasswordBody>req.body;
+
+  const user = await prisma.user.findUnique({ where: { email } });
+
+  if (!user) {
+    throw new BadRequestError([{ message: 'Email not found' }]);
+  }
+
+  await sendForgetPasswordEmail(email);
 
   const response = new ApiResponse({
     messages: [
       {
-        message: 'User details fetched successfully',
+        message: 'Reset password code sent successfully',
+      },
+      {
+        message: 'Please check your email',
       },
     ],
     statusCode: StatusCodes.OK,
-    data: user,
+    data: {},
+  });
+
+  res.status(response.statusCode).json(response);
+});
+
+/**
+ * @desc    Reset password
+ * @route   PATCH /api/v1/auth/reset-password
+ * @access  Public
+ */
+
+interface ResetPasswordBody {
+  password: string;
+  code: string;
+}
+
+export const resetPassword = expressAsyncHandler(async (req, res, next) => {
+  const { password, code } = <ResetPasswordBody>req.body;
+
+  const hashedCode = cryptoHash(code);
+  const currentTime = new Date().getTime();
+
+  const forgetPassword = await prisma.forgetPassword.findUnique({
+    where: {
+      code: hashedCode,
+      expiredAt: { gt: currentTime },
+    },
+  });
+
+  if (!forgetPassword) {
+    throw new BadRequestError([{ message: 'Invalid code or expired' }]);
+  }
+
+  const hashedPassword = Password.hash(password);
+
+  await prisma.user.update({
+    where: {
+      email: forgetPassword.email,
+    },
+    data: {
+      password: hashedPassword,
+      passwordChangeAt: new Date(),
+    },
+  });
+
+  await prisma.forgetPassword.deleteMany({
+    where: {
+      email: forgetPassword.email,
+    },
+  });
+
+  const token = generateToken({ id: forgetPassword.email });
+
+  req.session = { token };
+
+  const response = new ApiResponse({
+    messages: [
+      {
+        message: 'Password reset successfully',
+      },
+    ],
+    statusCode: StatusCodes.OK,
+    data: {},
   });
 
   res.status(response.statusCode).json(response);

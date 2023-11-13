@@ -27,14 +27,14 @@ export class ApiResponse {
   pagination?: ApiPagination;
   data;
   constructor({
-    statusCode,
+    statusCode = StatusCodes.OK,
     messages,
     data,
     pagination,
   }: {
-    statusCode: ApiResponseOptions['statusCode'];
     messages: ApiResponseOptions['messages'];
     data: ApiResponseOptions['data'];
+    statusCode?: ApiResponseOptions['statusCode'];
     pagination?: ApiResponseOptions['pagination'];
   }) {
     this.name = getReasonPhrase(statusCode);
