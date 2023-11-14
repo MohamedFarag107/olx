@@ -3,13 +3,14 @@ import {
   ApiResponse,
   Password,
   cryptoHash,
-  exclude,
   generateToken,
   prisma,
   sendForgetPasswordEmail,
 } from '@/utils';
 import expressAsyncHandler from 'express-async-handler';
 import { StatusCodes } from 'http-status-codes';
+
+/** ---------------------------------------------------------------------------------- */
 
 /**
  * @desc    signup a new user & set token in cookie
@@ -57,6 +58,7 @@ export const signup = expressAsyncHandler(async (req, res, next) => {
   res.status(response.statusCode).json(response);
 });
 
+/** ---------------------------------------------------------------------------------- */
 /**
  * @desc    Auth user & set token in cookie
  * @route   POST /api/v1/auth/signin
@@ -100,6 +102,7 @@ export const signin = expressAsyncHandler(async (req, res, next) => {
   res.status(response.statusCode).json(response);
 });
 
+/** ---------------------------------------------------------------------------------- */
 /**
  * @desc    Signout user & clear cookie
  * @route   POST /api/v1/auth/signout
@@ -120,6 +123,8 @@ export const signout = expressAsyncHandler(async (req, res, next) => {
 
   res.status(response.statusCode).json(response);
 });
+
+/** ---------------------------------------------------------------------------------- */
 
 /**
  * @desc    Forget password
@@ -156,6 +161,8 @@ export const forgetPassword = expressAsyncHandler(async (req, res, next) => {
 
   res.status(response.statusCode).json(response);
 });
+
+/** ---------------------------------------------------------------------------------- */
 
 /**
  * @desc    Reset password

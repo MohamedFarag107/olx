@@ -18,6 +18,9 @@ model User {
   passwordChangeAt DateTime  @default(now())
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
+  cart             Cart[]
+  Order            Order[]
+  active           Boolean   @default(true)
 }
 
 enum Role {
@@ -47,4 +50,190 @@ model Address {
   user      User     @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  Order     Order[]
+  active    Boolean  @default(true)
+}
+
+model Color {
+  id         String       @id @default(auto()) @map("_id") @db.ObjectId
+  code       String
+  name       String
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  ColorSize  ColorSize[]
+  CartItems  CartItems[]
+  OrderItems OrderItems[]
+  active     Boolean      @default(true)
+}
+
+model Size {
+  id         String       @id @default(auto()) @map("_id") @db.ObjectId
+  name       String       @unique
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  ColorSize  ColorSize[]
+  CartItems  CartItems[]
+  OrderItems OrderItems[]
+  active     Boolean      @default(true)
+}
+
+model ColorSize {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  colorId   String   @map("colorId") @db.ObjectId
+  color     Color    @relation(fields: [colorId], references: [id])
+  sizeId    String   @map("sizeId") @db.ObjectId
+  size      Size     @relation(fields: [sizeId], references: [id])
+  productId String   @map("productId") @db.ObjectId
+  product   Product  @relation(fields: [productId], references: [id])
+  stock     Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  active    Boolean  @default(true)
+}
+
+
+
+model Category {
+  id          String        @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  slug        String        @unique
+  image       String
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  SubCategory SubCategory[]
+  Product     Product[]
+  active      Boolean       @default(true)
+}
+
+model SubCategory {
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  name       String
+  slug       String    @unique
+  image      String
+  category   Category  @relation(fields: [categoryId], references: [id])
+  categoryId String    @map("categoryId") @db.ObjectId
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  Product    Product[]
+  active     Boolean   @default(true)
+}
+
+model Brand {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  slug      String    @unique
+  image     String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  Product   Product[]
+  active    Boolean   @default(true)
+}
+
+model Product {
+  id            String       @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  slug          String       @unique
+  description   String
+  images        String[]
+  price         Float
+  discount      Float
+  stock         Int
+  sold          Int          @default(0)
+  brand         Brand        @relation(fields: [brandId], references: [id])
+  brandId       String       @map("brandId") @db.ObjectId
+  category      Category     @relation(fields: [categoryId], references: [id])
+  categoryId    String       @map("categoryId") @db.ObjectId
+  subCategory   SubCategory  @relation(fields: [subCategoryId], references: [id])
+  subCategoryId String       @map("subCategoryId") @db.ObjectId
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  ColorSize     ColorSize[]
+  CartItems     CartItems[]
+  OrderItems    OrderItems[]
+  active        Boolean      @default(true)
+}
+
+model Coupon {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  code           String   @unique()
+  discount       Float
+  usageCount     Int      @default(0)
+  validUsage     Int
+  expirationDate DateTime
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  Cart           Cart[]
+  active         Boolean  @default(true)
+}
+
+model Cart {
+  id        String      @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String      @map("userId") @db.ObjectId
+  user      User        @relation(fields: [userId], references: [id])
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  coupon    Coupon?     @relation(fields: [couponId], references: [id])
+  CartItems CartItems[]
+  couponId  String?     @db.ObjectId
+  active    Boolean     @default(true)
+}
+
+model CartItems {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  cartId    String   @map("cartId") @db.ObjectId
+  cart      Cart     @relation(fields: [cartId], references: [id])
+  colorId   String   @map("colorId") @db.ObjectId
+  color     Color    @relation(fields: [colorId], references: [id])
+  sizeId    String   @map("sizeId") @db.ObjectId
+  size      Size     @relation(fields: [sizeId], references: [id])
+  quantity  Int
+  product   Product  @relation(fields: [productId], references: [id])
+  productId String   @map("productId") @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  active    Boolean  @default(true)
+
+  @@unique([cartId, colorId, sizeId, productId])
+}
+
+model Order {
+  id            String        @id @default(auto()) @map("_id") @db.ObjectId
+  userId        String        @map("userId") @db.ObjectId
+  user          User          @relation(fields: [userId], references: [id])
+  address       Address       @relation(fields: [addressId], references: [id])
+  addressId     String        @map("addressId") @db.ObjectId
+  paymentMethod PaymentMethod @default(CASHE)
+  status        OrderStatus   @default(PENDING)
+  items         OrderItems[]
+  total         Float
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  active        Boolean       @default(true)
+}
+
+enum OrderStatus {
+  PENDING
+  CREATED
+  FINISHED
+}
+
+enum PaymentMethod {
+  CASHE
+  CARD
+}
+
+model OrderItems {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  orderId   String   @map("orderId") @db.ObjectId
+  order     Order    @relation(fields: [orderId], references: [id])
+  colorId   String   @map("colorId") @db.ObjectId
+  color     Color    @relation(fields: [colorId], references: [id])
+  sizeId    String   @map("sizeId") @db.ObjectId
+  size      Size     @relation(fields: [sizeId], references: [id])
+  quantity  Int
+  product   Product  @relation(fields: [productId], references: [id])
+  productId String   @map("productId") @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  active    Boolean  @default(true)
 }
