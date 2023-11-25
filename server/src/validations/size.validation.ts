@@ -1,13 +1,31 @@
-import { check } from 'express-validator';
+import { body } from 'express-validator';
 
 import { validationMiddleware } from '@/middlewares';
-import { isHexColor } from '@/utils';
 import { SizeType } from '@/types/enums';
 export const createSizeValidation = [
-  check('name')
+  body('name')
     .notEmpty()
-    .withMessage('color name is required')
+    .withMessage('size name is required')
     .isIn(Object.values(SizeType))
-    .withMessage(`size name is invalid, must be one of ${Object.values(SizeType).join(', ')}`),
+    .withMessage(
+      `size name is invalid, must be one of ${Object.values(SizeType).join(
+        ', ',
+      )}`,
+    ),
+  validationMiddleware,
+];
+
+export const updateSizeValidation = [
+  body('id').isMongoId().withMessage('size id is required'),
+  body('name')
+    .notEmpty()
+    .withMessage('size name is required')
+    .isIn(Object.values(SizeType))
+    .withMessage(
+      `size name is invalid, must be one of ${Object.values(SizeType).join(
+        ', ',
+      )}`,
+    )
+    .optional(),
   validationMiddleware,
 ];

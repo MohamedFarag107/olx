@@ -15,7 +15,7 @@ import { mountRouter } from '@/routers';
 const app = express();
 
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: false }));
 app.use(
   cors({
     origin: process.env.CORS_ORIGIN,
@@ -25,8 +25,8 @@ app.use(
 
 app.use(
   cookieSession({
-    name: process.env.COOKIE_NAME,
-    keys: [process.env.COOKIE_SECRET],
+    name: process.env.COOKIE_NAME!,
+    keys: [process.env.COOKIE_SECRET!],
     maxAge: COOKIE_MAX_AGE,
   }),
 );

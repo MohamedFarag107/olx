@@ -1,5 +1,6 @@
-import { ResponseStatus } from '@/types/enums';
 import { StatusCodes, getReasonPhrase } from 'http-status-codes';
+
+import { MessageType, ResponseStatus } from '@/types/enums';
 
 export interface ApiPagination {
   total: number;
@@ -13,7 +14,7 @@ interface ApiResponseOptions {
   name: string;
   statusCode: StatusCodes;
   status: ResponseStatus;
-  messages: { message: string; type?: string }[];
+  messages: { message: string; type?: MessageType }[];
   pagination?: ApiPagination;
   data: any;
   metadata?: any;

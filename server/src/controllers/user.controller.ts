@@ -1,4 +1,4 @@
-import { BadRequestError } from '@/error';
+import { MessageType } from '@/types/enums';
 import { ApiResponse, exclude, prisma } from '@/utils';
 import expressAsyncHandler from 'express-async-handler';
 
@@ -16,7 +16,9 @@ export const updateMe = expressAsyncHandler(async (req, res, next) => {
   });
 
   const response = new ApiResponse({
-    messages: [{ message: 'Profile updated successfully' }],
+    messages: [
+      { message: 'Profile updated successfully', type: MessageType.SUCCESS },
+    ],
     data: {},
   });
 
@@ -34,6 +36,7 @@ export const getMe = expressAsyncHandler(async (req, res, next) => {
     messages: [
       {
         message: 'User details fetched successfully',
+        type: MessageType.SUCCESS,
       },
     ],
     data: user,

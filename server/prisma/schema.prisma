@@ -52,6 +52,7 @@ model Address {
   updatedAt DateTime @updatedAt
   Order     Order[]
   active    Boolean  @default(true)
+  @@index([userId])
 }
 
 model Color {
@@ -97,7 +98,7 @@ model Category {
   id          String        @id @default(auto()) @map("_id") @db.ObjectId
   name        String
   slug        String        @unique
-  image       String
+  image       Json
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
   SubCategory SubCategory[]
@@ -109,7 +110,7 @@ model SubCategory {
   id         String    @id @default(auto()) @map("_id") @db.ObjectId
   name       String
   slug       String    @unique
-  image      String
+  image      Json
   category   Category  @relation(fields: [categoryId], references: [id])
   categoryId String    @map("categoryId") @db.ObjectId
   createdAt  DateTime  @default(now())
@@ -122,7 +123,7 @@ model Brand {
   id        String    @id @default(auto()) @map("_id") @db.ObjectId
   name      String
   slug      String    @unique
-  image     String
+  image     Json
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   Product   Product[]
@@ -134,7 +135,7 @@ model Product {
   name          String
   slug          String       @unique
   description   String
-  images        String[]
+  images        Json[]
   price         Float
   discount      Float
   stock         Int

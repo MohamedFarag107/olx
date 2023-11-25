@@ -6,6 +6,5 @@ export * from './api-response';
 export * from './mailgun';
 export * from './code';
 export * from './emails';
-export * from './is-hex-color';
 export * from './get-pagination';
 export * from './constant';

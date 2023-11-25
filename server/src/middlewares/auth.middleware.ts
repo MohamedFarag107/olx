@@ -21,7 +21,7 @@ export const authMiddleware = expressAsyncHandler(
     }
 
     // check if user change password after token issued
-    if (user.updatedAt.getTime() > createdAt) {
+    if (user.passwordChangeAt.getTime() > createdAt) {
       throw new UnauthorizedError(
         'You have changed your password recently, please login again',
       );

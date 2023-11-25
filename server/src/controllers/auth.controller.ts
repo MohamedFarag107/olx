@@ -1,3 +1,6 @@
+import expressAsyncHandler from 'express-async-handler';
+import { StatusCodes } from 'http-status-codes';
+
 import { BadRequestError } from '@/error';
 import {
   ApiResponse,
@@ -7,8 +10,7 @@ import {
   prisma,
   sendForgetPasswordEmail,
 } from '@/utils';
-import expressAsyncHandler from 'express-async-handler';
-import { StatusCodes } from 'http-status-codes';
+import { MessageType } from '@/types/enums';
 
 /** ---------------------------------------------------------------------------------- */
 
@@ -27,7 +29,7 @@ export const signup = expressAsyncHandler(async (req, res, next) => {
   const isUserExists = await prisma.user.findUnique({ where: { email } });
 
   if (isUserExists) {
-    throw new BadRequestError([{ message: 'Email already exists' }]);
+    throw new BadRequestError([{ message: 'Email already exists', type: MessageType.ERROR }]);
   }
 
   const hashedPassword = Password.hash(password);
@@ -49,6 +51,7 @@ export const signup = expressAsyncHandler(async (req, res, next) => {
     messages: [
       {
         message: 'Signed up successfully',
+        type: MessageType.SUCCESS
       },
     ],
     statusCode: StatusCodes.CREATED,
@@ -60,7 +63,7 @@ export const signup = expressAsyncHandler(async (req, res, next) => {
 
 /** ---------------------------------------------------------------------------------- */
 /**
- * @desc    Auth user & set token in cookie
+ * @desc    Signin & set token in cookie
  * @route   POST /api/v1/auth/signin
  * @access  Public
  */
@@ -76,13 +79,13 @@ export const signin = expressAsyncHandler(async (req, res, next) => {
   const message = 'Email or password is incorrect';
 
   if (!user) {
-    throw new BadRequestError([{ message }]);
+    throw new BadRequestError([{ message, type: MessageType.ERROR }]);
   }
 
   const isPasswordMatch = Password.compare(password, user.password);
 
   if (!isPasswordMatch) {
-    throw new BadRequestError([{ message }]);
+    throw new BadRequestError([{ message, type: MessageType.ERROR }]);
   }
 
   const token = generateToken({ id: user.id });
@@ -93,6 +96,7 @@ export const signin = expressAsyncHandler(async (req, res, next) => {
     messages: [
       {
         message: 'Signed in successfully',
+        type: MessageType.SUCCESS
       },
     ],
     statusCode: StatusCodes.CREATED,
@@ -115,6 +119,7 @@ export const signout = expressAsyncHandler(async (req, res, next) => {
     messages: [
       {
         message: 'Signed out successfully',
+        type: MessageType.SUCCESS
       },
     ],
     statusCode: StatusCodes.OK,
@@ -141,7 +146,7 @@ export const forgetPassword = expressAsyncHandler(async (req, res, next) => {
   const user = await prisma.user.findUnique({ where: { email } });
 
   if (!user) {
-    throw new BadRequestError([{ message: 'Email not found' }]);
+    throw new BadRequestError([{ message: 'Email not found', type: MessageType.ERROR }]);
   }
 
   await sendForgetPasswordEmail(email);
@@ -150,9 +155,11 @@ export const forgetPassword = expressAsyncHandler(async (req, res, next) => {
     messages: [
       {
         message: 'Reset password code sent successfully',
+        type: MessageType.SUCCESS
       },
       {
         message: 'Please check your email',
+        type: MessageType.INFO
       },
     ],
     statusCode: StatusCodes.OK,
@@ -189,7 +196,7 @@ export const resetPassword = expressAsyncHandler(async (req, res, next) => {
   });
 
   if (!forgetPassword) {
-    throw new BadRequestError([{ message: 'Invalid code or expired' }]);
+    throw new BadRequestError([{ message: 'Invalid code or expired', type: MessageType.ERROR }]);
   }
 
   const hashedPassword = Password.hash(password);
@@ -218,6 +225,7 @@ export const resetPassword = expressAsyncHandler(async (req, res, next) => {
     messages: [
       {
         message: 'Password reset successfully',
+        type: MessageType.SUCCESS
       },
     ],
     statusCode: StatusCodes.OK,

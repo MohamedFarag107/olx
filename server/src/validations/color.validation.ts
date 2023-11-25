@@ -1,19 +1,24 @@
-import { check } from 'express-validator';
+import { body, param } from 'express-validator';
 
 import { validationMiddleware } from '@/middlewares';
-import { isHexColor } from '@/utils';
 export const createColorValidation = [
-  check('code')
+  body('code')
     .notEmpty()
     .withMessage('color code is required')
-    .custom((value) => {
-      const isColorCode = isHexColor(value);
-      if (!isColorCode) {
-        throw new Error('color code is invalid');
-      }
+    .isHexColor()
+    .withMessage('color code must be a valid hex color'),
+  body('name').notEmpty().withMessage('color name is required'),
+  validationMiddleware,
+];
 
-      return true;
-    }),
-  check('name').notEmpty().withMessage('color name is required'),
+export const updateColorValidation = [
+  param('id').isMongoId().withMessage('color id is required'),
+  body('code')
+    .notEmpty()
+    .withMessage('color code is required')
+    .isHexColor()
+    .withMessage('color code must be a valid hex color')
+    .optional(),
+  body('name').notEmpty().withMessage('color name is required').optional(),
   validationMiddleware,
 ];

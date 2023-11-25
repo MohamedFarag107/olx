@@ -1,9 +1,9 @@
 import { StatusCodes, getReasonPhrase } from 'http-status-codes';
 
-import { ResponseStatus } from '@/types/enums';
+import { MessageType, ResponseStatus } from '@/types/enums';
 interface ApiErrorOptions {
   statusCode: StatusCodes;
-  messages: { message: string; type?: string }[];
+  messages: { message: string; type?: MessageType }[];
   metadata?: any;
   status: ResponseStatus;
 }

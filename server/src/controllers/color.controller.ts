@@ -9,6 +9,8 @@ import {
 } from '@/utils';
 import { StatusCodes } from 'http-status-codes';
 import { PaginationQuery } from '@/types/interfaces';
+import { MessageType } from '@/types/enums';
+import { NotFoundError } from '@/error';
 
 /** ---------------------------------------------------------------------------------- */
 const SEARCHABLE_FIELDS: Array<Partial<keyof Color>> = ['name', 'code'];
@@ -37,6 +39,7 @@ export const createColor = expressAsyncHandler(async (req, res, next) => {
     messages: [
       {
         message: 'Color created successfully',
+        type: MessageType.SUCCESS,
       },
     ],
     statusCode: StatusCodes.CREATED,
@@ -55,7 +58,7 @@ export const createColor = expressAsyncHandler(async (req, res, next) => {
 interface DeleteColorParams {
   id: Color['id'];
 }
-export const deleteColor = expressAsyncHandler(async (req, res, next) => {
+export const deleteColorById = expressAsyncHandler(async (req, res, next) => {
   const { id } = <DeleteColorParams>(<unknown>req.params);
 
   const color = await prisma.color.update({
@@ -67,10 +70,17 @@ export const deleteColor = expressAsyncHandler(async (req, res, next) => {
     },
   });
 
+  if (!color) {
+    throw new NotFoundError([
+      { message: 'Color not found', type: MessageType.ERROR },
+    ]);
+  }
+
   const response = new ApiResponse({
     messages: [
       {
         message: 'Color deleted successfully',
+        type: MessageType.SUCCESS,
       },
     ],
     statusCode: StatusCodes.CREATED,
@@ -88,24 +98,18 @@ export const deleteColor = expressAsyncHandler(async (req, res, next) => {
  */
 
 export const getAllColors = expressAsyncHandler(async (req, res, next) => {
-  let { page, limit } = <PaginationQuery>(<unknown>req.query);
+  let { page, limit, q, sort } = <PaginationQuery>(<unknown>req.query);
 
   page = Number(page) || 1;
   limit = Number(limit) || 10;
   const skip = (page - 1) * limit;
 
-  const sort = <string | undefined>req.query?.sort;
   const orderBy = ORDERED_BY_CREATED_AT(sort);
 
-  const q = <string | undefined>req.query?.q;
   const where: Prisma.ColorWhereInput = {
     active: true,
     OR: SEARCH_FIELDS(SEARCHABLE_FIELDS, q),
   };
-
-  console.log({
-    where: JSON.stringify(where),
-  });
 
   const colors = await prisma.color.findMany({
     skip,
@@ -128,6 +132,7 @@ export const getAllColors = expressAsyncHandler(async (req, res, next) => {
     messages: [
       {
         message: 'Colors fetched successfully',
+        type: MessageType.SUCCESS,
       },
     ],
     statusCode: StatusCodes.CREATED,
@@ -139,3 +144,91 @@ export const getAllColors = expressAsyncHandler(async (req, res, next) => {
 });
 
 /** ---------------------------------------------------------------------------------- */
+
+/**
+ * @desc    get color by id
+ * @route   GET /api/v1/colors/:id
+ * @access  Public
+ */
+interface GetColorByIdParams {
+  id: Color['id'];
+}
+
+export const getColorById = expressAsyncHandler(async (req, res, next) => {
+  const { id } = <GetColorByIdParams>(<unknown>req.params);
+
+  const color = await prisma.color.findUnique({
+    where: {
+      id,
+    },
+  });
+
+  if (!color) {
+    throw new NotFoundError([
+      { message: 'Color not found', type: MessageType.ERROR },
+    ]);
+  }
+
+  const response = new ApiResponse({
+    messages: [
+      {
+        message: 'Color fetched successfully',
+        type: MessageType.SUCCESS,
+      },
+    ],
+    statusCode: StatusCodes.CREATED,
+    data: color,
+  });
+
+  res.status(response.statusCode).json(response);
+});
+
+/** ---------------------------------------------------------------------------------- */
+
+/**
+ * @desc    update color
+ * @route   PUT /api/v1/colors/:id
+ * @access  Private (admin)
+ */
+
+interface UpdateColorParams {
+  id: Color['id'];
+}
+
+interface UpdateColorBody {
+  code: Color['code'];
+  name: Color['name'];
+}
+
+export const updateColorById = expressAsyncHandler(async (req, res, next) => {
+  const { id } = <UpdateColorParams>(<unknown>req.params);
+  const { code, name } = <UpdateColorBody>req.body;
+  const color = await prisma.color.update({
+    where: {
+      id,
+    },
+    data: {
+      code,
+      name,
+    },
+  });
+
+  if (!color) {
+    throw new NotFoundError([
+      { message: 'Color not found', type: MessageType.ERROR },
+    ]);
+  }
+
+  const response = new ApiResponse({
+    messages: [
+      {
+        message: 'Color updated successfully',
+        type: MessageType.SUCCESS,
+      },
+    ],
+    statusCode: StatusCodes.CREATED,
+    data: color,
+  });
+
+  res.status(response.statusCode).json(response);
+});

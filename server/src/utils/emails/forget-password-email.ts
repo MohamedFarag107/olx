@@ -23,7 +23,7 @@ export const sendForgetPasswordEmail = async (email: string): Promise<void> => {
   });
 
   await sendEmail({
-    from: process.env.OLX_EMAIL,
+    from: process.env.OLX_EMAIL!,
     to: [email],
     subject: 'Forget Password',
     text: `Your Reset Code is: ${code}`,

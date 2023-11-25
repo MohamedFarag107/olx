@@ -5,7 +5,7 @@ interface GenerateTokenPayload {
 }
 export const generateToken = (payload: GenerateTokenPayload): string => {
   const createdAt = Date.now();
-  return jwt.sign({ ...payload, createdAt }, process.env.JWT_SECRET, {
+  return jwt.sign({ ...payload, createdAt }, process.env.JWT_SECRET!, {
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
 };
@@ -15,5 +15,5 @@ interface VerifyTokenPayload extends GenerateTokenPayload {
 }
 
 export const verifyToken = (token: string): VerifyTokenPayload => {
-  return <VerifyTokenPayload>jwt.verify(token, process.env.JWT_SECRET);
+  return <VerifyTokenPayload>jwt.verify(token, process.env.JWT_SECRET!);
 };

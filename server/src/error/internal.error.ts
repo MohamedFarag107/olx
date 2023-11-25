@@ -1,6 +1,6 @@
 import { StatusCodes } from 'http-status-codes';
 
-import { ResponseStatus } from '@/types/enums';
+import { MessageType, ResponseStatus } from '@/types/enums';
 import { ApiError } from './api.error';
 
 export class InternalServerError extends ApiError {
@@ -8,8 +8,8 @@ export class InternalServerError extends ApiError {
     super({
       statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
       messages: [
-        { message: 'Something went wrong' },
-        { message: error.message },
+        { message: 'Something went wrong', type: MessageType.ERROR },
+        { message: error.message, type: MessageType.ERROR },
       ],
       metadata: error,
       status: ResponseStatus.ERROR,

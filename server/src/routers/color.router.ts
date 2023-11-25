@@ -2,20 +2,32 @@ import { Role } from '@prisma/client';
 import { Router } from 'express';
 
 import { allowedTo, authMiddleware } from '@/middlewares';
-import { createColor, deleteColor, getAllColors } from '@/controllers';
-import { createColorValidation } from '@/validations';
+import {
+  createColor,
+  deleteColorById,
+  getAllColors,
+  getColorById,
+  updateColorById,
+} from '@/controllers';
+import {
+  createColorValidation,
+  mongoIdValidation,
+  updateColorValidation,
+} from '@/validations';
 
 const colorRouter = Router();
 
 colorRouter
   .route('/')
   .get(getAllColors)
-  .all(authMiddleware, allowedTo(Role.ADMIN), createColorValidation)
-  .post(createColor);
+  .all(authMiddleware, allowedTo(Role.ADMIN))
+  .post(createColorValidation, createColor);
 
 colorRouter
   .route('/:id')
+  .get(mongoIdValidation, getColorById)
   .all(authMiddleware, allowedTo(Role.ADMIN))
-  .delete(deleteColor);
+  .put(updateColorValidation, updateColorById)
+  .delete(mongoIdValidation, deleteColorById);
 
 export { colorRouter };
