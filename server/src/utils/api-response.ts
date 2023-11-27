@@ -14,7 +14,7 @@ interface ApiResponseOptions {
   name: string;
   statusCode: StatusCodes;
   status: ResponseStatus;
-  messages: { message: string; type?: MessageType }[];
+  messages: { message: string; type: MessageType }[];
   pagination?: ApiPagination;
   data: any;
   metadata?: any;
