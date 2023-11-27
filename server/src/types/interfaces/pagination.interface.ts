@@ -3,4 +3,5 @@ export interface PaginationQuery {
   page?: number;
   q?: string;
   sort?: string;
+  populate?: string;
 }

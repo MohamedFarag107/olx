@@ -12,3 +12,5 @@ export * from './size.validation';
 export * from './address.validation';
 export * from './user.validation';
 export * from './category.validation';
+export * from './subCategory.validation';
+export * from './brand.validation';

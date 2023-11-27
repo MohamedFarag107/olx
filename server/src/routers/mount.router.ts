@@ -6,6 +6,8 @@ import { sizeRouter } from './size.router';
 import { addressRouter } from './address.router';
 import { uploadRouter } from './upload.router';
 import { categoryRouter } from './category.router';
+import { subCategoryRouter } from './subCategory.router';
+import { BrandRouter } from './brand.router';
 
 const mountRouter = Router();
 
@@ -16,6 +18,8 @@ mountRouter.use('/sizes', sizeRouter);
 mountRouter.use('/address', addressRouter);
 mountRouter.use('/uploads', uploadRouter);
 mountRouter.use('/categories', categoryRouter);
+mountRouter.use('/sub-categories', subCategoryRouter);
+mountRouter.use('/brands', BrandRouter);
 
 
 export { mountRouter };

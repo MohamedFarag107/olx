@@ -1,12 +1,13 @@
 import expressAsyncHandler from 'express-async-handler';
+import { StatusCodes } from 'http-status-codes';
 import { Address } from '@prisma/client';
+
 import {
   ApiResponse,
   ORDERED_BY_CREATED_AT,
   getPagination,
   prisma,
 } from '@/utils';
-import { StatusCodes } from 'http-status-codes';
 import { PaginationQuery } from '@/types/interfaces';
 import { MessageType } from '@/types/enums';
 import { NotFoundError } from '@/error';

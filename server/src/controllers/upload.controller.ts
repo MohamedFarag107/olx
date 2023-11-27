@@ -1,16 +1,15 @@
 import expressAsyncHandler from 'express-async-handler';
 import sharp from 'sharp';
+import { format } from 'date-fns';
 import multer from 'multer';
 import { readFileSync } from 'fs';
 
 import { FileType, MessageType } from '@/types/enums';
 import { File } from '@/types/interfaces';
 import { NotFoundError } from '@/error';
-import { ApiResponse } from '@/utils';
-import { format } from 'date-fns';
+import { ApiResponse, UPLOAD_DIR } from '@/utils';
 
 const FILE_SIZE = 1024 * 1024 * 5; // 5MB
-const UPLOAD_DIR = `${process.cwd()}/src/uploads`;
 /** ---------------------------------------------------------------------------------- */
 /**
  * @desc    upload
@@ -20,8 +19,6 @@ const UPLOAD_DIR = `${process.cwd()}/src/uploads`;
 
 const diskStorage = multer.diskStorage({
   destination: (req, file, cb) => {
-    console.log(UPLOAD_DIR);
-
     cb(null, UPLOAD_DIR);
   },
   filename: (req, file, cb) => {

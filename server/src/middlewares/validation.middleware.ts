@@ -7,11 +7,7 @@ import { MessageType } from '@/types/enums';
 export const validationMiddleware = expressAsyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const result = validationResult(req);
-    console.log({
-      body: req.body,
-      params: req.params,
-      query: req.query,
-    })
+    
     if (!result.isEmpty()) {
       const messages: ApiError['messages'] = result
         .array({ onlyFirstError: true })

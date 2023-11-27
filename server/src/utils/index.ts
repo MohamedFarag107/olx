@@ -8,3 +8,5 @@ export * from './code';
 export * from './emails';
 export * from './get-pagination';
 export * from './constant';
+export * from './recover-from-not-found';
+export * from './delete-file';

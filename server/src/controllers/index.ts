@@ -5,3 +5,5 @@ export * from './size.controller';
 export * from './address.controller';
 export * from './upload.controller';
 export * from './category.controller';
+export * from './subCategory.controller';
+export * from './brand.controller';

@@ -18,8 +18,8 @@ model User {
   passwordChangeAt DateTime  @default(now())
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
-  cart             Cart[]
-  Order            Order[]
+  carts            Cart[]
+  orders           Order[]
   active           Boolean   @default(true)
 }
 
@@ -50,8 +50,9 @@ model Address {
   user      User     @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  Order     Order[]
+  orders    Order[]
   active    Boolean  @default(true)
+
   @@index([userId])
 }
 
@@ -61,9 +62,9 @@ model Color {
   name       String
   createdAt  DateTime     @default(now())
   updatedAt  DateTime     @updatedAt
-  ColorSize  ColorSize[]
-  CartItems  CartItems[]
-  OrderItems OrderItems[]
+  colorSizes ColorSize[]
+  cartItems  CartItems[]
+  orderItems OrderItems[]
   active     Boolean      @default(true)
 }
 
@@ -72,9 +73,9 @@ model Size {
   name       String       @unique
   createdAt  DateTime     @default(now())
   updatedAt  DateTime     @updatedAt
-  ColorSize  ColorSize[]
-  CartItems  CartItems[]
-  OrderItems OrderItems[]
+  colorSizes ColorSize[]
+  cartItems  CartItems[]
+  orderItems OrderItems[]
   active     Boolean      @default(true)
 }
 
@@ -92,18 +93,16 @@ model ColorSize {
   active    Boolean  @default(true)
 }
 
-
-
 model Category {
-  id          String        @id @default(auto()) @map("_id") @db.ObjectId
-  name        String
-  slug        String        @unique
-  image       Json
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  SubCategory SubCategory[]
-  Product     Product[]
-  active      Boolean       @default(true)
+  id            String        @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  slug          String        @unique
+  image         Json
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  subCategories SubCategory[]
+  products      Product[]
+  active        Boolean       @default(true)
 }
 
 model SubCategory {
@@ -115,7 +114,7 @@ model SubCategory {
   categoryId String    @map("categoryId") @db.ObjectId
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
-  Product    Product[]
+  products   Product[]
   active     Boolean   @default(true)
 }
 
@@ -126,7 +125,7 @@ model Brand {
   image     Json
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-  Product   Product[]
+  products  Product[]
   active    Boolean   @default(true)
 }
 
@@ -148,9 +147,9 @@ model Product {
   subCategoryId String       @map("subCategoryId") @db.ObjectId
   createdAt     DateTime     @default(now())
   updatedAt     DateTime     @updatedAt
-  ColorSize     ColorSize[]
-  CartItems     CartItems[]
-  OrderItems    OrderItems[]
+  colorSizes     ColorSize[]
+  cartItems     CartItems[]
+  orderItems    OrderItems[]
   active        Boolean      @default(true)
 }
 
@@ -163,7 +162,7 @@ model Coupon {
   expirationDate DateTime
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
-  Cart           Cart[]
+  carts           Cart[]
   active         Boolean  @default(true)
 }
 
@@ -174,7 +173,7 @@ model Cart {
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
   coupon    Coupon?     @relation(fields: [couponId], references: [id])
-  CartItems CartItems[]
+  cartItems CartItems[]
   couponId  String?     @db.ObjectId
   active    Boolean     @default(true)
 }
